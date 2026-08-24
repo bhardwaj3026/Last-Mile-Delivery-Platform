@@ -1,0 +1,53 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    background-color: #F1ECE0;
+    color: #1E2A38;
+    font-family: 'Inter', sans-serif;
+  }
+}
+
+/* Shipping Manifest Ticket Perforated Border Utility */
+.perforated-ticket {
+  position: relative;
+  background-color: #F8F5EE;
+  border: 1.5px solid #1E2A38;
+}
+
+.perforated-ticket::before,
+.perforated-ticket::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 6px;
+  background-size: 12px 6px;
+}
+
+.perforated-ticket::before {
+  top: -4px;
+  background-image: radial-gradient(circle at 6px -2px, transparent 6px, #1E2A38 7px);
+}
+
+.perforated-ticket::after {
+  bottom: -4px;
+  background-image: radial-gradient(circle at 6px 8px, transparent 6px, #1E2A38 7px);
+}
+
+/* Custom scrollbar for manifest tables */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #E6DEC8;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #1E2A38;
+  border-radius: 2px;
+}

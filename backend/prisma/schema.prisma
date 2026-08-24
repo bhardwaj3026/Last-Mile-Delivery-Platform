@@ -1,0 +1,141 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String   @id @default(uuid())
+  name         String
+  email        String   @unique
+  passwordHash String
+  role         String   @default("CUSTOMER") // "CUSTOMER" | "AGENT" | "ADMIN"
+  phone        String?
+  createdAt    DateTime @default(now())
+
+  agentProfile AgentProfile?
+  ordersPlaced Order[]        @relation("CustomerOrders")
+}
+
+model Zone {
+  id        String   @id @default(uuid())
+  name      String   @unique
+  createdAt DateTime @default(now())
+
+  rateCardsFrom RateCard[]       @relation("FromZone")
+  rateCardsTo   RateCard[]       @relation("ToZone")
+  agents        AgentProfile[]
+  pincodeMaps   PincodeZoneMap[]
+}
+
+model PincodeZoneMap {
+  pincode String @id
+  zoneId  String
+  zone    Zone   @relation(fields: [zoneId], references: [id], onDelete: Cascade)
+}
+
+model RateCard {
+  id          String   @id @default(uuid())
+  fromZoneId  String
+  toZoneId    String
+  orderType   String   // "B2B" | "B2C"
+  baseRate    Float    // flat base charge
+  perKgRate   Float    // charge per kg (billable weight)
+  isIntraZone Boolean  // true if fromZoneId == toZoneId, stored for fast lookup
+  createdAt   DateTime @default(now())
+
+  fromZone Zone @relation("FromZone", fields: [fromZoneId], references: [id])
+  toZone   Zone @relation("ToZone", fields: [toZoneId], references: [id])
+
+  @@unique([fromZoneId, toZoneId, orderType])
+}
+
+model CodSurchargeConfig {
+  id            String   @id @default(uuid())
+  orderType     String   @unique // "B2B" | "B2C"
+  flatFee       Float
+  percentOfBill Float    // e.g. 2.00 = 2%
+  updatedAt     DateTime @updatedAt
+}
+
+model AgentProfile {
+  id           String   @id @default(uuid())
+  userId       String   @unique
+  zoneId       String
+  availability String   @default("AVAILABLE") // "AVAILABLE" | "BUSY" | "OFFLINE"
+  currentLat   Float?
+  currentLng   Float?
+  updatedAt    DateTime @updatedAt
+
+  user   User    @relation(fields: [userId], references: [id])
+  zone   Zone    @relation(fields: [zoneId], references: [id])
+  orders Order[]
+}
+
+model Order {
+  id                 String    @id @default(uuid())
+  customerId         String
+  orderType          String    // "B2B" | "B2C"
+  paymentType        String    // "PREPAID" | "COD"
+  pickupAddress      String
+  pickupPincode      String
+  pickupZoneId       String
+  dropAddress        String
+  dropPincode        String
+  dropZoneId         String
+  lengthCm           Float
+  breadthCm          Float
+  heightCm           Float
+  actualWeightKg     Float
+  volumetricWeightKg Float
+  billableWeightKg   Float
+  rateCardId         String?
+  baseCharge         Float
+  weightCharge       Float
+  codSurcharge       Float     @default(0)
+  totalCharge        Float
+  status             String    @default("CREATED") // "CREATED" | "ASSIGNED" | "PICKED_UP" | "IN_TRANSIT" | "OUT_FOR_DELIVERY" | "DELIVERED" | "FAILED" | "RESCHEDULED"
+  agentId            String?
+  rescheduleDate     DateTime?
+  createdByAdmin     Boolean   @default(false)
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+
+  customer      User                 @relation("CustomerOrders", fields: [customerId], references: [id])
+  agent         AgentProfile?        @relation(fields: [agentId], references: [id])
+  statusHistory OrderStatusHistory[]
+}
+
+model OrderStatusHistory {
+  id        String   @id @default(uuid())
+  orderId   String
+  status    String   // OrderStatus
+  actorId   String   // userId of whoever triggered it
+  actorRole String   // Role
+  note      String?
+  createdAt DateTime @default(now())
+
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@index([orderId])
+}
+
+model NotificationLog {
+  id        String   @id @default(uuid())
+  orderId   String
+  channel   String   // "EMAIL" | "SMS"
+  toAddress String
+  subject   String?
+  status    String   // "SENT" | "FAILED"
+  createdAt DateTime @default(now())
+}
+
+model PincodeLookupCache {
+  pincode  String   @id
+  state    String
+  district String?
+  cachedAt DateTime @default(now())
+}
