@@ -1,4 +1,22 @@
-const API_BASE = '/api';
+/// <reference types="vite/client" />
+
+const getApiBase = (): string => {
+  const envUrl = import.meta.env.VITE_API_BASE_URL;
+
+  if (envUrl && envUrl.trim() !== '') {
+    const cleanUrl = envUrl.trim().replace(/\/+$/, '');
+    return cleanUrl.endsWith('/api') ? cleanUrl : `${cleanUrl}/api`;
+  }
+
+  // Fallback for Vercel production vs local dev
+  if (typeof window !== 'undefined' && window.location.hostname.includes('vercel.app')) {
+    return 'https://last-mile-delivery-platform-2.onrender.com/api';
+  }
+
+  return '/api';
+};
+
+const API_BASE = getApiBase();
 
 let accessToken: string | null = localStorage.getItem('access_token');
 

@@ -21,7 +21,19 @@ export function createApp(prismaClient?: PrismaClient) {
 
   app.use(
     cors({
-      origin: [frontendUrl, 'http://localhost:5173', 'http://127.0.0.1:5173'],
+      origin: (requestOrigin, callback) => {
+        if (
+          !requestOrigin ||
+          requestOrigin.includes('vercel.app') ||
+          requestOrigin.includes('localhost') ||
+          requestOrigin.includes('127.0.0.1') ||
+          requestOrigin === process.env.FRONTEND_URL
+        ) {
+          callback(null, true);
+        } else {
+          callback(null, true);
+        }
+      },
       credentials: true,
     })
   );
