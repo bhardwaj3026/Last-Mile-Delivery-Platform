@@ -1,6 +1,7 @@
 {
   "name": "last-mile-tracker-backend",
   "version": "1.0.0",
+  "type": "module",
   "description": "Backend API for Last-Mile Delivery Tracker platform",
   "main": "dist/server.js",
   "scripts": {

@@ -5,7 +5,7 @@ import bcrypt from 'bcryptjs';
 const prisma = new PrismaClient();
 
 async function main() {
-  console.log('🌱 Resetting Database & Seeding Rates (+₹120 Increase)...');
+  console.log('🌱 Resetting Database & Seeding Admin Credentials (Admin / Admin@123)...');
 
   // Clean all existing data
   await prisma.notificationLog.deleteMany();
@@ -74,44 +74,44 @@ async function main() {
 
   console.log('✅ Created 3 Zones with Major Indian City Pincodes');
 
-  // 3. Pre-configured Rate Cards (+₹120 increased base rates)
+  // 3. Pre-configured Rate Cards
   const rateCards = [
     // North -> North
-    { fromZoneId: zoneNorth.id, toZoneId: zoneNorth.id, orderType: OrderType.B2C, baseRate: 160.0, perKgRate: 10.0, isIntraZone: true },
-    { fromZoneId: zoneNorth.id, toZoneId: zoneNorth.id, orderType: OrderType.B2B, baseRate: 180.0, perKgRate: 8.0, isIntraZone: true },
+    { fromZoneId: zoneNorth.id, toZoneId: zoneNorth.id, orderType: OrderType.B2C, baseRate: 40.0, perKgRate: 10.0, isIntraZone: true },
+    { fromZoneId: zoneNorth.id, toZoneId: zoneNorth.id, orderType: OrderType.B2B, baseRate: 60.0, perKgRate: 8.0, isIntraZone: true },
     // North -> South
-    { fromZoneId: zoneNorth.id, toZoneId: zoneSouth.id, orderType: OrderType.B2C, baseRate: 200.0, perKgRate: 15.0, isIntraZone: false },
-    { fromZoneId: zoneNorth.id, toZoneId: zoneSouth.id, orderType: OrderType.B2B, baseRate: 240.0, perKgRate: 12.0, isIntraZone: false },
+    { fromZoneId: zoneNorth.id, toZoneId: zoneSouth.id, orderType: OrderType.B2C, baseRate: 80.0, perKgRate: 15.0, isIntraZone: false },
+    { fromZoneId: zoneNorth.id, toZoneId: zoneSouth.id, orderType: OrderType.B2B, baseRate: 120.0, perKgRate: 12.0, isIntraZone: false },
     // North -> West
-    { fromZoneId: zoneNorth.id, toZoneId: zoneWest.id, orderType: OrderType.B2C, baseRate: 210.0, perKgRate: 18.0, isIntraZone: false },
-    { fromZoneId: zoneNorth.id, toZoneId: zoneWest.id, orderType: OrderType.B2B, baseRate: 250.0, perKgRate: 14.0, isIntraZone: false },
+    { fromZoneId: zoneNorth.id, toZoneId: zoneWest.id, orderType: OrderType.B2C, baseRate: 90.0, perKgRate: 18.0, isIntraZone: false },
+    { fromZoneId: zoneNorth.id, toZoneId: zoneWest.id, orderType: OrderType.B2B, baseRate: 130.0, perKgRate: 14.0, isIntraZone: false },
     // South -> North
-    { fromZoneId: zoneSouth.id, toZoneId: zoneNorth.id, orderType: OrderType.B2C, baseRate: 205.0, perKgRate: 15.0, isIntraZone: false },
-    { fromZoneId: zoneSouth.id, toZoneId: zoneNorth.id, orderType: OrderType.B2B, baseRate: 245.0, perKgRate: 12.0, isIntraZone: false },
+    { fromZoneId: zoneSouth.id, toZoneId: zoneNorth.id, orderType: OrderType.B2C, baseRate: 85.0, perKgRate: 15.0, isIntraZone: false },
+    { fromZoneId: zoneSouth.id, toZoneId: zoneNorth.id, orderType: OrderType.B2B, baseRate: 125.0, perKgRate: 12.0, isIntraZone: false },
     // South -> South
-    { fromZoneId: zoneSouth.id, toZoneId: zoneSouth.id, orderType: OrderType.B2C, baseRate: 165.0, perKgRate: 10.0, isIntraZone: true },
-    { fromZoneId: zoneSouth.id, toZoneId: zoneSouth.id, orderType: OrderType.B2B, baseRate: 185.0, perKgRate: 8.0, isIntraZone: true },
+    { fromZoneId: zoneSouth.id, toZoneId: zoneSouth.id, orderType: OrderType.B2C, baseRate: 45.0, perKgRate: 10.0, isIntraZone: true },
+    { fromZoneId: zoneSouth.id, toZoneId: zoneSouth.id, orderType: OrderType.B2B, baseRate: 65.0, perKgRate: 8.0, isIntraZone: true },
     // West -> South
-    { fromZoneId: zoneWest.id, toZoneId: zoneSouth.id, orderType: OrderType.B2C, baseRate: 195.0, perKgRate: 14.0, isIntraZone: false },
-    { fromZoneId: zoneWest.id, toZoneId: zoneSouth.id, orderType: OrderType.B2B, baseRate: 230.0, perKgRate: 11.0, isIntraZone: false },
+    { fromZoneId: zoneWest.id, toZoneId: zoneSouth.id, orderType: OrderType.B2C, baseRate: 75.0, perKgRate: 14.0, isIntraZone: false },
+    { fromZoneId: zoneWest.id, toZoneId: zoneSouth.id, orderType: OrderType.B2B, baseRate: 110.0, perKgRate: 11.0, isIntraZone: false },
   ];
 
   for (const rc of rateCards) {
     await prisma.rateCard.create({ data: rc });
   }
 
-  console.log('✅ Created Rate Cards (+₹120 Base Rate Increase)');
+  console.log('✅ Created Rate Cards for Intra & Inter-zone routes');
 
-  // 4. Pre-configured COD Surcharge Config (+₹120 Flat Fee Increase)
+  // 4. Pre-configured COD Surcharge Config
   await prisma.codSurchargeConfig.create({
-    data: { orderType: OrderType.B2C, flatFee: 140.0, percentOfBill: 2.5 },
+    data: { orderType: OrderType.B2C, flatFee: 20.0, percentOfBill: 2.5 },
   });
   await prisma.codSurchargeConfig.create({
-    data: { orderType: OrderType.B2B, flatFee: 160.0, percentOfBill: 1.5 },
+    data: { orderType: OrderType.B2B, flatFee: 40.0, percentOfBill: 1.5 },
   });
 
-  console.log('✅ Created COD Surcharge Configs (+₹120 Flat Fee Increase)');
-  console.log('🎉 Database reset & Rate Increase seeding completed successfully!');
+  console.log('✅ Created COD Surcharge Configs');
+  console.log('🎉 Database reset & Admin seeding completed successfully!');
 }
 
 main()

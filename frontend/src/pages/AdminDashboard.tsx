@@ -45,14 +45,14 @@ export const AdminDashboard: React.FC = () => {
   const [rcFromZoneId, setRcFromZoneId] = useState('');
   const [rcToZoneId, setRcToZoneId] = useState('');
   const [rcOrderType, setRcOrderType] = useState<'B2C' | 'B2B'>('B2C');
-  const [rcBaseRate, setRcBaseRate] = useState(170);
+  const [rcBaseRate, setRcBaseRate] = useState(50);
   const [rcPerKgRate, setRcPerKgRate] = useState(10);
 
   // State for COD Config
   const [codConfigs, setCodConfigs] = useState<any[]>([]);
-  const [b2cFlat, setB2cFlat] = useState(140);
+  const [b2cFlat, setB2cFlat] = useState(20);
   const [b2cPercent, setB2cPercent] = useState(2.5);
-  const [b2bFlat, setB2bFlat] = useState(160);
+  const [b2bFlat, setB2bFlat] = useState(40);
   const [b2bPercent, setB2bPercent] = useState(1.5);
 
   // State for Agents

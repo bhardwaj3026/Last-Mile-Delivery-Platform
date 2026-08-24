@@ -3,7 +3,6 @@ import { fetchApi } from '../lib/api';
 import { StatusStamp, StatusType } from '../components/StatusStamp';
 import { OrderTrackingTimeline } from '../components/OrderTrackingTimeline';
 import { BalanceScale } from '../components/BalanceScale';
-import { RouteMap } from '../components/RouteMap';
 import { RescheduleModal } from '../components/RescheduleModal';
 import {
   Package,
@@ -587,15 +586,6 @@ export const CustomerDashboard: React.FC = () => {
                     </div>
                   </div>
                 )}
-
-                {/* Animated Route Manifest Vector Map */}
-                <RouteMap
-                  pickupZoneName={selectedOrder.pickupAddress}
-                  dropZoneName={selectedOrder.dropAddress}
-                  pickupPincode={selectedOrder.pickupPincode}
-                  dropPincode={selectedOrder.dropPincode}
-                  status={selectedOrder.status}
-                />
 
                 {/* Package Specifications Grid */}
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 bg-[#E6DEC8]/40 p-4 rounded border border-[#1E2A38]/20 font-mono text-xs">

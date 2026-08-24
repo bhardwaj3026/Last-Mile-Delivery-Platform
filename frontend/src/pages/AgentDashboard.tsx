@@ -3,7 +3,6 @@ import { fetchApi } from '../lib/api';
 import { useAuth } from '../context/AuthContext';
 import { StatusStamp, StatusType } from '../components/StatusStamp';
 import { OrderTrackingTimeline } from '../components/OrderTrackingTimeline';
-import { RouteMap } from '../components/RouteMap';
 import { UserCheck, RefreshCw, CheckCircle2, AlertTriangle, MapPin, Truck, Package } from 'lucide-react';
 
 interface Order {
@@ -223,15 +222,6 @@ export const AgentDashboard: React.FC = () => {
                   />
                 </div>
               </div>
-
-              {/* Animated Route Manifest Vector Map */}
-              <RouteMap
-                pickupZoneName={selectedOrder.pickupAddress}
-                dropZoneName={selectedOrder.dropAddress}
-                pickupPincode={selectedOrder.pickupPincode}
-                dropPincode={selectedOrder.dropPincode}
-                status={selectedOrder.status}
-              />
 
               {/* Order Details & Audit Timeline */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 font-mono text-xs bg-paper p-4 rounded border border-[#1E2A38]/30">
