@@ -30,17 +30,18 @@ export class NotificationService {
   private async getTransporter(): Promise<nodemailer.Transporter | null> {
     if (this.transporter) return this.transporter;
 
-    const host = process.env.SMTP_HOST;
-    const user = process.env.SMTP_USER;
-    const pass = process.env.SMTP_PASS;
+    const host = process.env.SMTP_HOST || 'smtp.gmail.com';
+    const user = process.env.SMTP_USER || 'trip71373@gmail.com';
+    const pass = process.env.SMTP_PASS || 'xawdzqvafmsxqbdg';
+    const port = parseInt(process.env.SMTP_PORT || '587', 10);
 
-    // 1. If valid user credentials (not mock) are provided in .env
+    // 1. Primary Gmail / Custom SMTP
     if (host && user && !user.includes('mock_user') && user.trim() !== '') {
       try {
         this.transporter = nodemailer.createTransport({
           host,
-          port: parseInt(process.env.SMTP_PORT || '587', 10),
-          secure: process.env.SMTP_PORT === '465',
+          port,
+          secure: port === 465,
           auth: { user, pass },
         });
         return this.transporter;
@@ -49,7 +50,7 @@ export class NotificationService {
       }
     }
 
-    // 2. Auto-create Ethereal Test Account for zero-config live email preview links
+    // 2. Auto-create Ethereal Test Account for fallback
     try {
       const testAccount = await nodemailer.createTestAccount();
       this.transporter = nodemailer.createTransport({
@@ -90,7 +91,7 @@ export class NotificationService {
 
       if (transporter && payload.recipientEmail) {
         const info = await transporter.sendMail({
-          from: process.env.SMTP_FROM || '"LastMile Logistics" <no-reply@lastmile.com>',
+          from: process.env.SMTP_FROM || '"LastMile Logistics" <trip71373@gmail.com>',
           to: payload.recipientEmail,
           subject,
           text: textBody,
