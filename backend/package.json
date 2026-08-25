@@ -5,8 +5,9 @@
   "description": "Backend API for Last-Mile Delivery Tracker platform",
   "main": "dist/server.js",
   "scripts": {
-    "build": "tsc",
+    "build": "prisma generate && tsc",
     "start": "node dist/server.js",
+    "postinstall": "prisma generate",
     "dev": "tsx watch src/server.ts",
     "test": "vitest run",
     "seed": "tsx prisma/seed.ts",
