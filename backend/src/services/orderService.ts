@@ -17,12 +17,19 @@ export class OrderService {
   private prisma: PrismaClient;
   private notificationService: NotificationService;
 
-  constructor(prisma: PrismaClient, notificationService: NotificationService) {
-    this.prisma = prisma;
-    this.notificationService = notificationService;
+  private engineCache: { zones: any[]; rateCards: any[]; codConfigs: any[]; timestamp: number } | null = null;
+  private CACHE_TTL_MS = 60000; // 1 minute TTL
+
+  public clearEngineCache() {
+    this.engineCache = null;
   }
 
   private async fetchEngineData() {
+    const now = Date.now();
+    if (this.engineCache && (now - this.engineCache.timestamp) < this.CACHE_TTL_MS) {
+      return this.engineCache;
+    }
+
     const zones = await this.prisma.zone.findMany({ select: { id: true, name: true, pincodeMaps: true } });
     const rateCardsRaw = await this.prisma.rateCard.findMany();
     const codConfigsRaw = await this.prisma.codSurchargeConfig.findMany();
@@ -42,7 +49,8 @@ export class OrderService {
       percentOfBill: Number(c.percentOfBill),
     }));
 
-    return { zones, rateCards, codConfigs };
+    this.engineCache = { zones, rateCards, codConfigs, timestamp: now };
+    return this.engineCache;
   }
 
   public async getQuote(input: QuoteInput): Promise<ChargeBreakdown> {

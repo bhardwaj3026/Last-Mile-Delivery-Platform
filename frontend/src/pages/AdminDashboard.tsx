@@ -15,6 +15,8 @@ import {
   Check,
   AlertTriangle,
   UserPlus,
+  Trash2,
+  X,
 } from 'lucide-react';
 
 export const AdminDashboard: React.FC = () => {
@@ -61,6 +63,16 @@ export const AdminDashboard: React.FC = () => {
   const [newAgentEmail, setNewAgentEmail] = useState('');
   const [newAgentPass, setNewAgentPass] = useState('AgentPass123!');
   const [newAgentZoneId, setNewAgentZoneId] = useState('');
+
+  // State for Agent Edit/Remove Modals
+  const [editingAgent, setEditingAgent] = useState<any | null>(null);
+  const [editAgentName, setEditAgentName] = useState('');
+  const [editAgentPhone, setEditAgentPhone] = useState('');
+  const [editAgentZoneId, setEditAgentZoneId] = useState('');
+  const [editAgentAvailability, setEditAgentAvailability] = useState('AVAILABLE');
+  const [editAgentPass, setEditAgentPass] = useState('');
+
+  const [deletingAgent, setDeletingAgent] = useState<any | null>(null);
 
   // State for Notifications Log
   const [notificationLogs, setNotificationLogs] = useState<any[]>([]);
@@ -306,6 +318,51 @@ export const AdminDashboard: React.FC = () => {
       await fetchAgents();
     } catch (err: any) {
       alert(err.message || 'Failed creating agent');
+    }
+  };
+
+  const handleStartEditAgent = (agent: any) => {
+    setEditingAgent(agent);
+    setEditAgentName(agent.user?.name || '');
+    setEditAgentPhone(agent.user?.phone || '');
+    setEditAgentZoneId(agent.zoneId || (zones.length > 0 ? zones[0].id : ''));
+    setEditAgentAvailability(agent.availability || 'AVAILABLE');
+    setEditAgentPass('');
+  };
+
+  const handleSaveEditAgent = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingAgent) return;
+    try {
+      const payload: any = {
+        name: editAgentName,
+        phone: editAgentPhone,
+        zoneId: editAgentZoneId,
+        availability: editAgentAvailability,
+      };
+      if (editAgentPass.trim() !== '') {
+        payload.password = editAgentPass;
+      }
+      await fetchApi(`/admin/agents/${editingAgent.id}`, {
+        method: 'PATCH',
+        body: JSON.stringify(payload),
+      });
+      setEditingAgent(null);
+      await fetchAgents();
+    } catch (err: any) {
+      alert(err.message || 'Failed updating agent');
+    }
+  };
+
+  const handleDeleteAgent = async (agentId: string) => {
+    try {
+      await fetchApi(`/admin/agents/${agentId}`, {
+        method: 'DELETE',
+      });
+      setDeletingAgent(null);
+      await fetchAgents();
+    } catch (err: any) {
+      alert(err.message || 'Failed removing agent');
     }
   };
 
@@ -993,7 +1050,7 @@ export const AdminDashboard: React.FC = () => {
               {agents.map(agent => {
                 const isAvailable = agent.availability === 'AVAILABLE';
                 return (
-                  <div key={agent.id} className="bg-[#F8F5EE] border-2 border-[#1E2A38] p-4 rounded-xs shadow-sm flex items-center justify-between">
+                  <div key={agent.id} className="bg-[#F8F5EE] border-2 border-[#1E2A38] p-4 rounded-xs shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                     <div>
                       <div className="flex items-center space-x-2">
                         {/* Radar Pulse Indicator */}
@@ -1005,22 +1062,182 @@ export const AdminDashboard: React.FC = () => {
                         </div>
                         <span className="font-bold text-base text-[#1E2A38]">{agent.user?.name}</span>
                       </div>
-                      <div className="text-slate-600 mt-1">Zone: {agent.zone?.name}</div>
+                      <div className="text-slate-600 mt-1">
+                        <span className="font-bold">Zone:</span> {agent.zone?.name} | <span className="font-bold">Email:</span> {agent.user?.email}
+                      </div>
                       <div className="text-[10px] text-slate-500">
-                        GPS: {agent.currentLat || 'N/A'}, {agent.currentLng || 'N/A'}
+                        Phone: {agent.user?.phone || 'N/A'} | GPS: {agent.currentLat || 'N/A'}, {agent.currentLng || 'N/A'}
                       </div>
                     </div>
 
-                    <div className="text-right">
-                      <span className={`px-3 py-1 text-xs font-bold uppercase rounded-xs border border-[#1E2A38] ${
+                    <div className="flex items-center space-x-2 self-end sm:self-center">
+                      <span className={`px-2.5 py-1 text-xs font-bold uppercase rounded-xs border border-[#1E2A38] ${
                         isAvailable ? 'bg-[#2E6B4F] text-paper' : 'bg-[#B4432E] text-paper'
                       }`}>
                         {agent.availability}
                       </span>
+
+                      {/* Modify Agent Button */}
+                      <button
+                        onClick={() => handleStartEditAgent(agent)}
+                        title="Modify Agent Profile"
+                        className="bg-[#E6DEC8] border border-[#1E2A38] p-1.5 rounded-xs hover:bg-[#D9CBAE] text-[#1E2A38] transition-colors"
+                      >
+                        <Edit2 size={15} />
+                      </button>
+
+                      {/* Remove Agent Button */}
+                      <button
+                        onClick={() => setDeletingAgent(agent)}
+                        title="Remove Agent Profile"
+                        className="bg-[#B4432E]/10 border border-[#B4432E] p-1.5 rounded-xs hover:bg-[#B4432E] hover:text-paper text-[#B4432E] transition-colors"
+                      >
+                        <Trash2 size={15} />
+                      </button>
                     </div>
                   </div>
                 );
               })}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* EDIT AGENT MODAL */}
+      {editingAgent && (
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 z-50">
+          <div className="bg-[#F8F5EE] border-2 border-[#1E2A38] max-w-md w-full p-6 rounded-xs shadow-2xl space-y-4 font-mono text-xs relative">
+            <button
+              onClick={() => setEditingAgent(null)}
+              className="absolute top-4 right-4 text-slate-600 hover:text-[#1E2A38]"
+            >
+              <X size={18} />
+            </button>
+
+            <div className="font-stencil text-xl uppercase text-[#1E2A38] border-b border-[#1E2A38]/30 pb-2 flex items-center">
+              <Edit2 size={18} className="mr-2 text-[#C68A2E]" /> Modify Agent: {editingAgent.user?.name}
+            </div>
+
+            <form onSubmit={handleSaveEditAgent} className="space-y-3">
+              <div>
+                <label className="block font-bold uppercase mb-1">Agent Name</label>
+                <input
+                  type="text"
+                  value={editAgentName}
+                  onChange={e => setEditAgentName(e.target.value)}
+                  className="w-full bg-paper border border-[#1E2A38] p-2 font-bold rounded-xs"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block font-bold uppercase mb-1">Phone Number</label>
+                <input
+                  type="text"
+                  value={editAgentPhone}
+                  onChange={e => setEditAgentPhone(e.target.value)}
+                  placeholder="+91 9876543210"
+                  className="w-full bg-paper border border-[#1E2A38] p-2 font-bold rounded-xs"
+                />
+              </div>
+
+              <div>
+                <label className="block font-bold uppercase mb-1">Assigned Base Zone</label>
+                <select
+                  value={editAgentZoneId}
+                  onChange={e => setEditAgentZoneId(e.target.value)}
+                  className="w-full bg-paper border border-[#1E2A38] p-2 font-bold rounded-xs"
+                >
+                  {zones.map(z => (
+                    <option key={z.id} value={z.id}>
+                      {z.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block font-bold uppercase mb-1">Availability Status</label>
+                <select
+                  value={editAgentAvailability}
+                  onChange={e => setEditAgentAvailability(e.target.value)}
+                  className="w-full bg-paper border border-[#1E2A38] p-2 font-bold rounded-xs"
+                >
+                  <option value="AVAILABLE">AVAILABLE</option>
+                  <option value="BUSY">BUSY</option>
+                  <option value="OFFLINE">OFFLINE</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block font-bold uppercase mb-1">Reset Password (Optional)</label>
+                <input
+                  type="password"
+                  value={editAgentPass}
+                  onChange={e => setEditAgentPass(e.target.value)}
+                  placeholder="Leave blank to keep current password"
+                  className="w-full bg-paper border border-[#1E2A38] p-2 font-bold rounded-xs"
+                />
+              </div>
+
+              <div className="pt-2 flex justify-end space-x-2">
+                <button
+                  type="button"
+                  onClick={() => setEditingAgent(null)}
+                  className="px-4 py-2 border border-[#1E2A38] rounded-xs font-bold uppercase bg-[#E6DEC8] hover:bg-[#D9CBAE]"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-2 border border-[#1E2A38] rounded-xs font-bold uppercase bg-[#1E2A38] text-paper hover:bg-slate-800"
+                >
+                  Save Modifications
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* CONFIRM DELETE AGENT MODAL */}
+      {deletingAgent && (
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 z-50">
+          <div className="bg-[#F8F5EE] border-2 border-[#1E2A38] max-w-md w-full p-6 rounded-xs shadow-2xl space-y-4 font-mono text-xs relative">
+            <button
+              onClick={() => setDeletingAgent(null)}
+              className="absolute top-4 right-4 text-slate-600 hover:text-[#1E2A38]"
+            >
+              <X size={18} />
+            </button>
+
+            <div className="font-stencil text-xl uppercase text-[#B4432E] border-b border-[#1E2A38]/30 pb-2 flex items-center">
+              <AlertTriangle size={20} className="mr-2 text-[#B4432E]" /> Confirm Agent Removal
+            </div>
+
+            <p className="text-slate-800 leading-relaxed">
+              Are you sure you want to remove agent <strong className="text-[#1E2A38]">{deletingAgent.user?.name}</strong> ({deletingAgent.user?.email}) from active duty in <strong className="text-[#1E2A38]">{deletingAgent.zone?.name}</strong>?
+            </p>
+
+            <div className="bg-amber-100 border border-amber-400 p-2.5 rounded-xs text-[11px] text-amber-900">
+              ⚠️ Active assigned waybills will be unassigned to allow auto-dispatch to reassign them.
+            </div>
+
+            <div className="flex justify-end space-x-2 pt-2">
+              <button
+                type="button"
+                onClick={() => setDeletingAgent(null)}
+                className="px-4 py-2 border border-[#1E2A38] rounded-xs font-bold uppercase bg-[#E6DEC8] hover:bg-[#D9CBAE]"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={() => handleDeleteAgent(deletingAgent.id)}
+                className="px-4 py-2 border border-[#1E2A38] rounded-xs font-bold uppercase bg-[#B4432E] text-paper hover:bg-red-800"
+              >
+                Remove Agent
+              </button>
             </div>
           </div>
         </div>

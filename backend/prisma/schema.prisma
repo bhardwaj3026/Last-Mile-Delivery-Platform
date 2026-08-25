@@ -107,6 +107,12 @@ model Order {
   customer      User                 @relation("CustomerOrders", fields: [customerId], references: [id])
   agent         AgentProfile?        @relation(fields: [agentId], references: [id])
   statusHistory OrderStatusHistory[]
+
+  @@index([customerId])
+  @@index([agentId])
+  @@index([status])
+  @@index([pickupZoneId])
+  @@index([dropZoneId])
 }
 
 model OrderStatusHistory {

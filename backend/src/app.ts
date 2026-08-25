@@ -48,7 +48,7 @@ export function createApp(prismaClient?: PrismaClient) {
 
   // Mount routers
   app.use('/api/auth', createAuthRouter(prisma, notificationService));
-  app.use('/api/admin', createAdminRouter(prisma, notificationService));
+  app.use('/api/admin', createAdminRouter(prisma, notificationService, orderService));
   app.use('/api/orders', createOrderRouter(prisma, orderService));
 
   // Global Error Handler

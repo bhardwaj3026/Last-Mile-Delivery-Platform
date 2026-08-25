@@ -71,6 +71,13 @@ export class NotificationService {
   }
 
   public async send(payload: NotificationPayload): Promise<void> {
+    // Non-blocking fire-and-forget background execution for instant API response
+    this.sendInternal(payload).catch(err => {
+      console.error('[NotificationService] Async send error:', err?.message || err);
+    });
+  }
+
+  private async sendInternal(payload: NotificationPayload): Promise<void> {
     const subject = this.formatSubject(payload.event, payload.orderId, payload.status);
     const textBody = this.formatBody(payload);
 

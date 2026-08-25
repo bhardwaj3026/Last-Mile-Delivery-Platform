@@ -5,9 +5,14 @@ import { Role, OrderType, AgentAvailability } from '../types/enums.js';
 import { requireAuth, requireRole, AuthenticatedRequest } from '../middleware/authMiddleware.js';
 import { NotificationService } from '../services/notificationService.js';
 import { getIndianStateForPincode } from '../engine/rateEngine.js';
+import { OrderService } from '../services/orderService.js';
 import { z } from 'zod';
 
-export function createAdminRouter(prisma: PrismaClient, notificationService?: NotificationService): Router {
+export function createAdminRouter(
+  prisma: PrismaClient,
+  notificationService?: NotificationService,
+  orderService?: OrderService
+): Router {
   const router = Router();
 
   // Protect all admin routes with ADMIN role
@@ -37,13 +42,16 @@ export function createAdminRouter(prisma: PrismaClient, notificationService?: No
         });
       }
 
-      // 2. Cache miss: Call India Post API with 3s timeout
+      // 2. Fast check offline dictionary for instant match
+      const dictionaryState = getIndianStateForPincode(cleanPincode);
+
+      // 3. Cache miss: Call India Post API with 800ms timeout
       let state: string | null = null;
       let district: string | null = null;
 
       try {
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 3000);
+        const timeoutId = setTimeout(() => controller.abort(), 800);
 
         const apiRes = await fetch(`https://api.postalpincode.in/pincode/${cleanPincode}`, {
           signal: controller.signal,
@@ -58,7 +66,7 @@ export function createAdminRouter(prisma: PrismaClient, notificationService?: No
           }
         }
       } catch (apiErr: any) {
-        console.log(`[PincodeLookup] India Post API timeout/error for ${cleanPincode}:`, apiErr?.message);
+        // Soft catch API latency/error
       }
 
       // 3. If API returned valid state, store in cache
@@ -124,6 +132,7 @@ export function createAdminRouter(prisma: PrismaClient, notificationService?: No
         include: { pincodeMaps: true },
       });
 
+      orderService?.clearEngineCache();
       return res.status(201).json(zone);
     } catch (err: any) {
       return res.status(400).json({ error: err.message });
@@ -168,6 +177,7 @@ export function createAdminRouter(prisma: PrismaClient, notificationService?: No
         include: { pincodeMaps: true },
       });
 
+      orderService?.clearEngineCache();
       return res.json(updated);
     } catch (err: any) {
       return res.status(400).json({ error: err.message });
@@ -190,6 +200,7 @@ export function createAdminRouter(prisma: PrismaClient, notificationService?: No
         create: { pincode: cleanPincode, zoneId: body.zoneId },
       });
 
+      orderService?.clearEngineCache();
       return res.status(200).json(map);
     } catch (err: any) {
       return res.status(400).json({ error: err.message });
@@ -236,6 +247,7 @@ export function createAdminRouter(prisma: PrismaClient, notificationService?: No
         include: { fromZone: true, toZone: true },
       });
 
+      orderService?.clearEngineCache();
       return res.status(201).json(rateCard);
     } catch (err: any) {
       return res.status(400).json({ error: err.message });
@@ -271,6 +283,7 @@ export function createAdminRouter(prisma: PrismaClient, notificationService?: No
         include: { fromZone: true, toZone: true },
       });
 
+      orderService?.clearEngineCache();
       return res.json(updated);
     } catch (err: any) {
       return res.status(400).json({ error: err.message });
@@ -302,6 +315,7 @@ export function createAdminRouter(prisma: PrismaClient, notificationService?: No
         },
       });
 
+      orderService?.clearEngineCache();
       return res.json(config);
     } catch (err: any) {
       return res.status(400).json({ error: err.message });
@@ -456,30 +470,92 @@ export function createAdminRouter(prisma: PrismaClient, notificationService?: No
     }
   });
 
-  // PATCH /api/admin/agents/:id/availability
-  router.patch('/agents/:id/availability', async (req: Request, res: Response) => {
+  // PATCH /api/admin/agents/:id (Modify agent details)
+  router.patch('/agents/:id', async (req: Request, res: Response) => {
     try {
       const { id } = req.params;
       const schema = z.object({
-        availability: z.enum(['AVAILABLE', 'BUSY', 'OFFLINE']).optional(),
-        currentLat: z.number().optional(),
-        currentLng: z.number().optional(),
+        name: z.string().min(2).optional(),
+        phone: z.string().optional(),
         zoneId: z.string().uuid().optional(),
+        availability: z.enum(['AVAILABLE', 'BUSY', 'OFFLINE']).optional(),
+        password: z.string().min(6).optional(),
       });
       const body = schema.parse(req.body);
 
+      const agent = await prisma.agentProfile.findUnique({ where: { id }, include: { user: true } });
+      if (!agent) {
+        return res.status(404).json({ error: 'Agent profile not found' });
+      }
+
+      // Update User fields if name/phone/password provided
+      if (body.name || body.phone !== undefined || body.password) {
+        const userUpdateData: any = {};
+        if (body.name) userUpdateData.name = body.name;
+        if (body.phone !== undefined) userUpdateData.phone = body.phone;
+        if (body.password) userUpdateData.passwordHash = await bcrypt.hash(body.password, 12);
+
+        await prisma.user.update({
+          where: { id: agent.userId },
+          data: userUpdateData,
+        });
+      }
+
+      // Update AgentProfile fields
       const updated = await prisma.agentProfile.update({
         where: { id },
         data: {
           ...(body.availability && { availability: body.availability as AgentAvailability }),
-          ...(body.currentLat !== undefined && { currentLat: body.currentLat }),
-          ...(body.currentLng !== undefined && { currentLng: body.currentLng }),
           ...(body.zoneId && { zoneId: body.zoneId }),
         },
-        include: { user: true, zone: true },
+        include: {
+          user: { select: { id: true, name: true, email: true, phone: true } },
+          zone: true,
+        },
       });
 
       return res.json(updated);
+    } catch (err: any) {
+      return res.status(400).json({ error: err.message });
+    }
+  });
+
+  // DELETE /api/admin/agents/:id (Remove agent)
+  router.delete('/agents/:id', async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+
+      const agent = await prisma.agentProfile.findUnique({ where: { id } });
+      if (!agent) {
+        return res.status(404).json({ error: 'Agent profile not found' });
+      }
+
+      // 1. Unassign agent from active/past orders
+      await prisma.order.updateMany({
+        where: { agentId: id },
+        data: { agentId: null },
+      });
+
+      // 2. Delete AgentProfile
+      await prisma.agentProfile.delete({
+        where: { id },
+      });
+
+      // 3. Revert user role to CUSTOMER or delete user if created solely as agent
+      const ordersPlaced = await prisma.order.count({ where: { customerId: agent.userId } });
+      if (ordersPlaced > 0) {
+        await prisma.user.update({
+          where: { id: agent.userId },
+          data: { role: Role.CUSTOMER },
+        });
+      } else {
+        await prisma.user.update({
+          where: { id: agent.userId },
+          data: { role: Role.CUSTOMER },
+        });
+      }
+
+      return res.json({ message: 'Agent removed successfully', id });
     } catch (err: any) {
       return res.status(400).json({ error: err.message });
     }
