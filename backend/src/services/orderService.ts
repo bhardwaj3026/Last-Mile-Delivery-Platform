@@ -17,6 +17,11 @@ export class OrderService {
   private prisma: PrismaClient;
   private notificationService: NotificationService;
 
+  constructor(prisma: PrismaClient, notificationService: NotificationService) {
+    this.prisma = prisma;
+    this.notificationService = notificationService;
+  }
+
   private engineCache: { zones: any[]; rateCards: any[]; codConfigs: any[]; timestamp: number } | null = null;
   private CACHE_TTL_MS = 60000; // 1 minute TTL
 
