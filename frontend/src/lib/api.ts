@@ -3,14 +3,18 @@
 const getApiBase = (): string => {
   const envUrl = import.meta.env.VITE_API_BASE_URL;
 
+  // On Vercel deployments, if VITE_API_BASE_URL is relative (/api) or missing, force full Render backend URL
+  if (typeof window !== 'undefined' && window.location.hostname.includes('vercel.app')) {
+    if (envUrl && envUrl.trim().startsWith('http')) {
+      const cleanUrl = envUrl.trim().replace(/\/+$/, '');
+      return cleanUrl.endsWith('/api') ? cleanUrl : `${cleanUrl}/api`;
+    }
+    return 'https://last-mile-delivery-platform-2.onrender.com/api';
+  }
+
   if (envUrl && envUrl.trim() !== '') {
     const cleanUrl = envUrl.trim().replace(/\/+$/, '');
     return cleanUrl.endsWith('/api') ? cleanUrl : `${cleanUrl}/api`;
-  }
-
-  // Fallback for Vercel production vs local dev
-  if (typeof window !== 'undefined' && window.location.hostname.includes('vercel.app')) {
-    return 'https://last-mile-delivery-platform-2.onrender.com/api';
   }
 
   return '/api';
@@ -34,6 +38,7 @@ export function getAccessToken(): string | null {
 }
 
 export async function fetchApi<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
+  const apiBase = getApiBase();
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
     ...(options.headers as Record<string, string>),
@@ -43,7 +48,7 @@ export async function fetchApi<T>(endpoint: string, options: RequestInit = {}): 
     headers['Authorization'] = `Bearer ${accessToken}`;
   }
 
-  const response = await fetch(`${API_BASE}${endpoint}`, {
+  const response = await fetch(`${apiBase}${endpoint}`, {
     ...options,
     headers,
     credentials: 'include',
