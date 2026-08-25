@@ -16,10 +16,9 @@ async function testEmail() {
   if (user && user.trim() !== '') {
     try {
       const transporter = nodemailer.createTransport({
-        host,
-        port: parseInt(process.env.SMTP_PORT || '587', 10),
-        secure: process.env.SMTP_PORT === '465',
+        service: 'gmail',
         auth: { user, pass },
+        tls: { rejectUnauthorized: false },
       });
 
       console.log('📡 Verifying SMTP connection with provider...');

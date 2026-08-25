@@ -38,12 +38,21 @@ export class NotificationService {
     // 1. Primary Gmail / Custom SMTP
     if (host && user && !user.includes('mock_user') && user.trim() !== '') {
       try {
-        this.transporter = nodemailer.createTransport({
-          host,
-          port,
-          secure: port === 465,
-          auth: { user, pass },
-        });
+        if (host.includes('gmail') || user.endsWith('@gmail.com')) {
+          this.transporter = nodemailer.createTransport({
+            service: 'gmail',
+            auth: { user, pass },
+            tls: { rejectUnauthorized: false },
+          });
+        } else {
+          this.transporter = nodemailer.createTransport({
+            host,
+            port,
+            secure: port === 465,
+            auth: { user, pass },
+            tls: { rejectUnauthorized: false },
+          });
+        }
         return this.transporter;
       } catch (err) {
         console.error('[NotificationService] Custom SMTP initialization error:', err);
