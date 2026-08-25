@@ -99,6 +99,7 @@ export class NotificationService {
       const transporter = await this.getTransporter();
 
       if (transporter && payload.recipientEmail) {
+        console.log(`[NotificationService] Attempting send to ${payload.recipientEmail} (${payload.event})...`);
         const info = await transporter.sendMail({
           from: process.env.SMTP_FROM || '"LastMile Logistics" <trip71373@gmail.com>',
           to: payload.recipientEmail,
@@ -119,8 +120,9 @@ export class NotificationService {
         console.log(`[Email Output] To: ${payload.recipientEmail} | Subject: ${subject}\n${textBody}`);
       }
     } catch (err: any) {
-      console.error(`[EmailChannel Error] Failed sending email to ${payload.recipientEmail}:`, err?.message);
+      console.error(`[EmailChannel Error] Failed sending email to ${payload.recipientEmail}:`, err?.message || err);
       emailStatus = 'FAILED';
+      this.transporter = null; // Invalidate cached transporter on failure to reconnect on next attempt
     }
 
     // Write to NotificationLog database table

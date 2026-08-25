@@ -25,12 +25,12 @@ async function testEmail() {
       await transporter.verify();
       console.log('✅ SMTP connection verified successfully!');
 
-      console.log('✉️ Sending test email to user...');
+      console.log('✉️ Sending test email to Bhardwajharsha3@gmail.com...');
       const info = await transporter.sendMail({
-        from: process.env.SMTP_FROM || user,
-        to: user,
-        subject: '[LastMile Test] Email Delivery Verification',
-        text: 'Hello! This is a test email from your Last-Mile Delivery Tracker platform. Real inbox delivery is working!',
+        from: process.env.SMTP_FROM || `"LastMile Logistics" <${user}>`,
+        to: 'Bhardwajharsha3@gmail.com',
+        subject: '[LastMile Test] Live Inbox Delivery Check',
+        text: 'Hello! This is a live test email from your Last-Mile Delivery Tracker platform to Bhardwajharsha3@gmail.com.',
       });
       console.log('🎉 Email sent successfully! Message ID:', info.messageId);
     } catch (err: any) {
