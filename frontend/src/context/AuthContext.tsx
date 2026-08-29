@@ -15,7 +15,7 @@ export interface User {
 interface AuthContextType {
   user: User | null;
   isLoading: boolean;
-  login: (email: string, pass: string) => Promise<void>;
+  login: (email: string, pass: string) => Promise<User>;
   register: (name: string, email: string, pass: string, phone?: string) => Promise<void>;
   logout: () => Promise<void>;
   refreshUser: () => Promise<void>;
@@ -48,14 +48,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     fetchCurrentUser();
   }, []);
 
-  const login = async (email: string, pass: string) => {
+  const login = async (email: string, pass: string): Promise<User> => {
     const data = await fetchApi<{ accessToken: string; user: User }>('/auth/login', {
       method: 'POST',
       body: JSON.stringify({ email, password: pass }),
     });
     setAccessToken(data.accessToken);
     setUser(data.user);
+    return data.user;
   };
+
 
   const register = async (name: string, email: string, pass: string, phone?: string) => {
     const data = await fetchApi<{ accessToken: string; user: User }>('/auth/register', {

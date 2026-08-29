@@ -125,6 +125,32 @@
   animation: perforatedShimmerSweep 0.8s ease-out 1 forwards;
 }
 
+/* Card Shake on Failed Submission */
+@keyframes cardShake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-6px); }
+  40% { transform: translateX(6px); }
+  60% { transform: translateX(-6px); }
+  80% { transform: translateX(6px); }
+}
+
+.animate-card-shake {
+  animation: cardShake 300ms ease-out;
+}
+
+/* Card Exit Fade + Scale Down on Success */
+.login-card-exit {
+  opacity: 0;
+  transform: scale(0.97) !important;
+  transition: opacity 250ms ease-out, transform 250ms ease-out !important;
+}
+
+/* Stamp Fade Out */
+.stamp-fade-out {
+  opacity: 0;
+  transition: opacity 200ms ease-out;
+}
+
 /* Reduced Motion Constraints */
 @media (prefers-reduced-motion: reduce) {
   .animate-float-drift {
@@ -146,5 +172,16 @@
   .manifest-input {
     transition-duration: 0ms !important;
   }
+  .animate-card-shake {
+    animation: none !important;
+  }
+  .login-card-exit {
+    transform: none !important;
+    transition: opacity 250ms ease-out !important;
+  }
+  .animate-stamp-drop {
+    animation: none !important;
+  }
 }
+
 

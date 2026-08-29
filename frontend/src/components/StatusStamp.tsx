@@ -14,10 +14,11 @@ export type StatusType =
 interface StatusStampProps {
   status: StatusType;
   animate?: boolean;
-  size?: 'sm' | 'md' | 'lg';
+  size?: 'sm' | 'md' | 'lg' | 'hero';
+  label?: string;
 }
 
-export const StatusStamp: React.FC<StatusStampProps> = ({ status, animate = true, size = 'md' }) => {
+export const StatusStamp: React.FC<StatusStampProps> = ({ status, animate = true, size = 'md', label }) => {
   const getColors = () => {
     switch (status) {
       case 'DELIVERED':
@@ -38,22 +39,22 @@ export const StatusStamp: React.FC<StatusStampProps> = ({ status, animate = true
   };
 
   const getIcon = () => {
-    const iconSize = size === 'sm' ? 14 : size === 'lg' ? 20 : 16;
+    const iconSize = size === 'hero' ? 28 : size === 'lg' ? 20 : size === 'sm' ? 14 : 16;
     switch (status) {
       case 'DELIVERED':
-        return <CheckCircle2 size={iconSize} className="mr-1 inline" />;
+        return <CheckCircle2 size={iconSize} className="mr-2 inline" />;
       case 'FAILED':
-        return <AlertTriangle size={iconSize} className="mr-1 inline" />;
+        return <AlertTriangle size={iconSize} className="mr-2 inline" />;
       case 'OUT_FOR_DELIVERY':
       case 'IN_TRANSIT':
-        return <Truck size={iconSize} className="mr-1 inline" />;
+        return <Truck size={iconSize} className="mr-1.5 inline" />;
       case 'PICKED_UP':
       case 'ASSIGNED':
-        return <Package size={iconSize} className="mr-1 inline" />;
+        return <Package size={iconSize} className="mr-1.5 inline" />;
       case 'RESCHEDULED':
-        return <RefreshCw size={iconSize} className="mr-1 inline" />;
+        return <RefreshCw size={iconSize} className="mr-1.5 inline" />;
       default:
-        return <Clock size={iconSize} className="mr-1 inline" />;
+        return <Clock size={iconSize} className="mr-1.5 inline" />;
     }
   };
 
@@ -61,6 +62,7 @@ export const StatusStamp: React.FC<StatusStampProps> = ({ status, animate = true
     sm: 'text-xs px-2 py-0.5 border-2',
     md: 'text-sm px-3 py-1 border-2 font-bold tracking-wider',
     lg: 'text-base px-4 py-1.5 border-[3px] font-bold tracking-widest',
+    hero: 'text-xl sm:text-2xl px-6 py-3 border-[4px] font-extrabold tracking-widest shadow-xl',
   };
 
   return (
@@ -69,11 +71,12 @@ export const StatusStamp: React.FC<StatusStampProps> = ({ status, animate = true
         sizeClasses[size]
       } ${animate ? 'animate-stamp-drop' : ''}`}
       style={{
-        boxShadow: '1px 2px 0px rgba(30, 42, 56, 0.2), inset 0 0 0 1px currentColor',
+        boxShadow: size === 'hero' ? '2px 4px 0px rgba(30, 42, 56, 0.25), inset 0 0 0 2px currentColor' : '1px 2px 0px rgba(30, 42, 56, 0.2), inset 0 0 0 1px currentColor',
       }}
     >
       {getIcon()}
-      <span>{status.replace(/_/g, ' ')}</span>
+      <span>{label || status.replace(/_/g, ' ')}</span>
     </div>
   );
 };
+
