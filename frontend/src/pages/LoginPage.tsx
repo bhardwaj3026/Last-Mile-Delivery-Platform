@@ -11,6 +11,7 @@ export const LoginPage: React.FC = () => {
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [isPasswordFocused, setIsPasswordFocused] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   // Motion & submission state
@@ -115,13 +116,26 @@ export const LoginPage: React.FC = () => {
             isShaking ? 'animate-card-shake' : ''
           }`}
         >
-          {/* Original Cartoon Cat Mascot with Cursor-Tracking Eyes */}
-          <CatMascot />
+          {/* Dual Cartoon Cat Mascots with Cursor-Tracking & Privacy Eye-Covering */}
+          <CatMascot
+            mirrored={true}
+            eyesCovered={isPasswordFocused || stampState === 'success'}
+            bobDelayMs={1200}
+            blinkOffsetMs={2200}
+            positionClassName="absolute -top-10 left-4 z-20"
+          />
+          <CatMascot
+            mirrored={false}
+            eyesCovered={isPasswordFocused || stampState === 'success'}
+            bobDelayMs={0}
+            blinkOffsetMs={0}
+            positionClassName="absolute -top-10 right-4 z-20"
+          />
 
           {/* Hero Stamp Submission Overlay */}
           {stampState !== 'none' && (
             <div
-              className={`absolute inset-0 flex items-center justify-center z-30 bg-[#F8F5EE]/65 backdrop-blur-[1px] rounded-xs ${
+              className={`absolute inset-0 flex items-center justify-center z-30 bg-kraft/80 backdrop-blur-[1px] rounded-xs ${
                 stampFadingOut ? 'stamp-fade-out' : ''
               }`}
             >
@@ -142,28 +156,28 @@ export const LoginPage: React.FC = () => {
           </div>
 
           <div className="text-center mb-6">
-            <div className="font-stencil text-2xl uppercase tracking-widest text-[#1E2A38]">
+            <div className="font-stencil text-2xl uppercase tracking-widest text-ink">
               Manifest Access Authentication
             </div>
-            <div className="font-mono text-xs text-slate-600 mt-1">
+            <div className="font-mono text-xs text-ink/70 mt-1">
               Last-Mile Logistics System Login
             </div>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block font-mono text-xs font-bold uppercase mb-1 text-[#1E2A38]">
+              <label className="block font-mono text-xs font-bold uppercase mb-1 text-ink">
                 Email Address
               </label>
               <div className="relative">
-                <Mail size={16} className="absolute left-3 top-3 text-slate-500 pointer-events-none" />
+                <Mail size={16} className="absolute left-3 top-3 text-ink/50 pointer-events-none" />
                 <input
                   type="email"
                   value={email}
                   onChange={e => setEmail(e.target.value)}
                   placeholder="user@example.com"
                   disabled={isSubmitting}
-                  className="manifest-input w-full bg-[#E6DEC8]/40 border-2 pl-10 pr-3 py-2 font-mono text-sm rounded-xs focus:outline-none disabled:opacity-50"
+                  className="manifest-input w-full bg-paper/50 text-ink border-2 border-ink/40 pl-10 pr-3 py-2 font-mono text-sm rounded-xs focus:outline-none focus:border-ink disabled:opacity-50"
                   required
                 />
               </div>
@@ -171,29 +185,31 @@ export const LoginPage: React.FC = () => {
 
             <div>
               <div className="flex items-center justify-between mb-1">
-                <label className="block font-mono text-xs font-bold uppercase text-[#1E2A38]">
+                <label className="block font-mono text-xs font-bold uppercase text-ink">
                   Password
                 </label>
-                <Link to="/forgot-password" className="font-mono text-xs text-[#1E2A38] hover:underline font-semibold">
+                <Link to="/forgot-password" className="font-mono text-xs text-ink hover:underline font-semibold">
                   Forgot Password?
                 </Link>
               </div>
               <div className="relative">
-                <KeyRound size={16} className="absolute left-3 top-3 text-slate-500 pointer-events-none" />
+                <KeyRound size={16} className="absolute left-3 top-3 text-ink/50 pointer-events-none" />
                 <input
                   type="password"
                   value={password}
                   onChange={e => setPassword(e.target.value)}
+                  onFocus={() => setIsPasswordFocused(true)}
+                  onBlur={() => setIsPasswordFocused(false)}
                   placeholder="••••••••"
                   disabled={isSubmitting}
-                  className="manifest-input w-full bg-[#E6DEC8]/40 border-2 pl-10 pr-3 py-2 font-mono text-sm rounded-xs focus:outline-none disabled:opacity-50"
+                  className="manifest-input w-full bg-paper/50 text-ink border-2 border-ink/40 pl-10 pr-3 py-2 font-mono text-sm rounded-xs focus:outline-none focus:border-ink disabled:opacity-50"
                   required
                 />
               </div>
             </div>
 
             {error && (
-              <div className="mt-3 bg-[#B4432E]/10 border border-[#B4432E] text-[#B4432E] text-xs font-mono p-3 rounded-xs flex items-center">
+              <div className="mt-3 bg-stamp-red/10 border border-stamp-red text-stamp-red text-xs font-mono p-3 rounded-xs flex items-center">
                 <AlertCircle size={16} className="mr-2 shrink-0" />
                 {error}
               </div>
@@ -202,7 +218,7 @@ export const LoginPage: React.FC = () => {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="stamp-btn cursor-stamp w-full bg-[#1E2A38] text-paper font-mono font-bold text-sm uppercase py-2.5 rounded-xs shadow-md disabled:opacity-50 mt-2"
+              className="stamp-btn cursor-stamp w-full bg-ink text-paper font-mono font-bold text-sm uppercase py-2.5 rounded-xs shadow-md disabled:opacity-50 mt-2"
             >
               {isSubmitting
                 ? stampState === 'success'
@@ -214,9 +230,9 @@ export const LoginPage: React.FC = () => {
             </button>
           </form>
 
-          <div className="mt-6 text-center border-t border-[#1E2A38]/20 pt-4">
-            <span className="font-mono text-xs text-slate-600">Need a Customer Account? </span>
-            <Link to="/register" className="font-mono text-xs font-bold text-[#1E2A38] underline">
+          <div className="mt-6 text-center border-t border-ink/20 pt-4">
+            <span className="font-mono text-xs text-ink/70">Need a Customer Account? </span>
+            <Link to="/register" className="font-mono text-xs font-bold text-ink underline">
               Register Here
             </Link>
           </div>

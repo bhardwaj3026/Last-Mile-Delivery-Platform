@@ -22,19 +22,19 @@ export const StatusStamp: React.FC<StatusStampProps> = ({ status, animate = true
   const getColors = () => {
     switch (status) {
       case 'DELIVERED':
-        return 'text-[#2E6B4F] border-[#2E6B4F] bg-[#2E6B4F]/10';
+        return 'text-stamp-green border-stamp-green bg-stamp-green/15';
       case 'FAILED':
-        return 'text-[#B4432E] border-[#B4432E] bg-[#B4432E]/10';
+        return 'text-stamp-red border-stamp-red bg-stamp-red/15';
       case 'IN_TRANSIT':
       case 'OUT_FOR_DELIVERY':
-        return 'text-[#1D5C8A] border-[#1D5C8A] bg-[#1D5C8A]/10';
+        return 'text-stamp-blue border-stamp-blue bg-stamp-blue/15';
       case 'ASSIGNED':
       case 'PICKED_UP':
-        return 'text-[#C68A2E] border-[#C68A2E] bg-[#C68A2E]/10';
+        return 'text-stamp-amber border-stamp-amber bg-stamp-amber/15';
       case 'RESCHEDULED':
-        return 'text-purple-800 border-purple-800 bg-purple-100';
+        return 'text-purple-400 border-purple-400 bg-purple-950/30';
       default:
-        return 'text-slate-700 border-slate-700 bg-slate-200/50';
+        return 'text-text-secondary border-text-secondary bg-kraft/30';
     }
   };
 

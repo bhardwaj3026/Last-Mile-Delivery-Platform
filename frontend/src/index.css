@@ -2,19 +2,47 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --paper: #F1ECE0;
+  --ink: #1E2A38;
+  --kraft: #D9CBAE;
+  --text-primary: #1E2A38;
+  --text-secondary: #4A5568;
+  --text-muted: #6B7280;
+  --stamp-red: #B4432E;
+  --stamp-green: #2E6B4F;
+  --stamp-amber: #C68A2E;
+  --stamp-blue: #1D5C8A;
+}
+
+[data-theme="dark"] {
+  --paper: #14181F;
+  --ink: #EDE7D9;
+  --kraft: #232A35;
+  --text-primary: #F1ECE0;
+  --text-secondary: #D9CBAE;
+  --text-muted: #9CA3AF;
+  --stamp-red: #D9634A;
+  --stamp-green: #4A9873;
+  --stamp-amber: #E0A94D;
+  --stamp-blue: #3A86C8;
+}
+
 @layer base {
   body {
-    background-color: #F1ECE0;
-    color: #1E2A38;
+    background-color: var(--paper);
+    color: var(--text-primary);
     font-family: 'Inter', sans-serif;
+    transition: background-color 200ms ease, color 200ms ease;
   }
 }
 
 /* Shipping Manifest Ticket Perforated Border Utility */
 .perforated-ticket {
   position: relative;
-  background-color: #F8F5EE;
-  border: 1.5px solid #1E2A38;
+  background-color: var(--kraft);
+  border: 1.5px solid var(--ink);
+  transition: background-color 200ms ease, border-color 200ms ease, color 200ms ease;
 }
 
 .perforated-ticket::before,
@@ -29,12 +57,12 @@
 
 .perforated-ticket::before {
   top: -4px;
-  background-image: radial-gradient(circle at 6px -2px, transparent 6px, #1E2A38 7px);
+  background-image: radial-gradient(circle at 6px -2px, transparent 6px, var(--ink) 7px);
 }
 
 .perforated-ticket::after {
   bottom: -4px;
-  background-image: radial-gradient(circle at 6px 8px, transparent 6px, #1E2A38 7px);
+  background-image: radial-gradient(circle at 6px 8px, transparent 6px, var(--ink) 7px);
 }
 
 /* Custom scrollbar for manifest tables */
@@ -44,11 +72,11 @@
 }
 
 ::-webkit-scrollbar-track {
-  background: #E6DEC8;
+  background: var(--kraft);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #1E2A38;
+  background: var(--ink);
   border-radius: 2px;
 }
 
@@ -65,34 +93,7 @@
   animation: floatDrift 4s ease-in-out infinite;
 }
 
-/* Custom Manifest Cursors */
 
-/* Primary Action Buttons, Submit Buttons & Stamp Elements: Rubber Stamp Cursor */
-button[type="submit"],
-.stamp-btn,
-.cursor-stamp {
-  cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%231E2A38' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><rect x='5' y='14' width='14' height='6' rx='1'/><path d='M9 14V9a3 3 0 0 1 6 0v5'/><path d='M12 4v2'/></svg>") 12 12, pointer;
-}
-
-/* Navigation Links, Buttons & Clickable Elements: Waybill Tag Pointer Cursor */
-a,
-button:not([type="submit"]),
-[role="button"],
-.cursor-pointer {
-  cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%231E2A38' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z'/><polyline points='14 2 14 8 20 8'/><line x1='16' y1='13' x2='8' y2='13'/><line x1='16' y1='17' x2='8' y2='17'/></svg>") 4 4, pointer;
-}
-
-/* Form Inputs, Textareas & Selects: Fountain Pen Nib Cursor */
-input[type="text"],
-input[type="email"],
-input[type="password"],
-input[type="number"],
-input[type="tel"],
-textarea,
-select,
-.manifest-input {
-  cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%231E2A38' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M12 19l7-7 3 3-7 7-3-3z'/><path d='M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z'/><path d='M2 2l7.586 7.586'/><circle cx='11' cy='11' r='2'/></svg>") 2 22, text;
-}
 
 .stamp-btn {
   transition: transform 150ms ease-out, background-color 150ms ease-out, box-shadow 150ms ease-out;

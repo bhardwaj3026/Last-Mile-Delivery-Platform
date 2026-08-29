@@ -1,6 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
+import { ThemeProvider } from './context/ThemeContext';
 import { Navbar } from './components/Navbar';
 import { LoginPage } from './pages/LoginPage';
 import { RegisterPage } from './pages/RegisterPage';
@@ -49,54 +50,56 @@ const ProtectedRoute: React.FC<{ children: React.ReactNode; allowedRoles?: strin
 
 export const App: React.FC = () => {
   return (
-    <AuthProvider>
-      <Router>
-        <div className="min-h-screen flex flex-col bg-paper text-ink">
-          <Navbar />
-          <main className="flex-1">
-            <Routes>
-              <Route path="/" element={<HomeRedirect />} />
-              <Route path="/login" element={<LoginPage />} />
-              <Route path="/register" element={<RegisterPage />} />
-              <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-              <Route path="/reset-password" element={<ResetPasswordPage />} />
+    <ThemeProvider>
+      <AuthProvider>
+        <Router>
+          <div className="min-h-screen flex flex-col bg-paper text-ink transition-colors duration-200">
+            <Navbar />
+            <main className="flex-1">
+              <Routes>
+                <Route path="/" element={<HomeRedirect />} />
+                <Route path="/login" element={<LoginPage />} />
+                <Route path="/register" element={<RegisterPage />} />
+                <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+                <Route path="/reset-password" element={<ResetPasswordPage />} />
 
-              <Route
-                path="/customer"
-                element={
-                  <ProtectedRoute allowedRoles={['CUSTOMER', 'ADMIN']}>
-                    <CustomerDashboard />
-                  </ProtectedRoute>
-                }
-              />
+                <Route
+                  path="/customer"
+                  element={
+                    <ProtectedRoute allowedRoles={['CUSTOMER', 'ADMIN']}>
+                      <CustomerDashboard />
+                    </ProtectedRoute>
+                  }
+                />
 
-              <Route
-                path="/agent"
-                element={
-                  <ProtectedRoute allowedRoles={['AGENT', 'ADMIN']}>
-                    <AgentDashboard />
-                  </ProtectedRoute>
-                }
-              />
+                <Route
+                  path="/agent"
+                  element={
+                    <ProtectedRoute allowedRoles={['AGENT', 'ADMIN']}>
+                      <AgentDashboard />
+                    </ProtectedRoute>
+                  }
+                />
 
-              <Route
-                path="/admin"
-                element={
-                  <ProtectedRoute allowedRoles={['ADMIN']}>
-                    <AdminDashboard />
-                  </ProtectedRoute>
-                }
-              />
+                <Route
+                  path="/admin"
+                  element={
+                    <ProtectedRoute allowedRoles={['ADMIN']}>
+                      <AdminDashboard />
+                    </ProtectedRoute>
+                  }
+                />
 
-              <Route path="*" element={<Navigate to="/" replace />} />
-            </Routes>
-          </main>
-          <footer className="bg-[#1E2A38] text-paper border-t-2 border-[#1E2A38] py-4 text-center font-mono text-xs text-paper/70">
-            LASTMILE LOGISTICS TRACKER // MANIFEST DISPATCH SYSTEM
-          </footer>
-        </div>
-      </Router>
-    </AuthProvider>
+                <Route path="*" element={<Navigate to="/" replace />} />
+              </Routes>
+            </main>
+            <footer className="bg-ink text-paper/80 border-t-2 border-kraft/20 py-4 text-center font-mono text-xs transition-colors duration-200">
+              LASTMILE LOGISTICS TRACKER // MANIFEST DISPATCH SYSTEM
+            </footer>
+          </div>
+        </Router>
+      </AuthProvider>
+    </ThemeProvider>
   );
 };
 

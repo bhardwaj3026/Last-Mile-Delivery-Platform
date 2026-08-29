@@ -50,26 +50,26 @@ export const RouteMap: React.FC<RouteMapProps> = ({
   const isFailed = status === 'FAILED';
 
   return (
-    <div className="bg-[#F8F5EE] border border-[#1E2A38] p-4 rounded-sm">
-      <div className="flex items-center justify-between mb-3 border-b border-[#1E2A38]/20 pb-2">
+    <div className="bg-paper border border-ink/40 p-4 rounded-sm">
+      <div className="flex items-center justify-between mb-3 border-b border-ink/20 pb-2">
         <div className="flex items-center space-x-2">
-          <Navigation size={16} className="text-[#1E2A38]" />
-          <span className="font-mono text-xs uppercase font-bold tracking-wider text-[#1E2A38]">
+          <Navigation size={16} className="text-text-primary" />
+          <span className="font-mono text-xs uppercase font-bold tracking-wider text-text-primary">
             Route Manifest Vector
           </span>
         </div>
-        <span className="font-mono text-xs text-[#1E2A38]/80 font-semibold">
+        <span className="font-mono text-xs text-text-secondary font-semibold">
           Progress: {progressPct}%
         </span>
       </div>
 
-      <div className="relative w-full h-32 bg-paper rounded border border-[#1E2A38]/30 overflow-hidden flex items-center justify-center">
+      <div className="relative w-full h-32 bg-paper rounded border border-ink/30 overflow-hidden flex items-center justify-center">
         {/* Grid Background Lines */}
         <div
           className="absolute inset-0 opacity-10"
           style={{
             backgroundImage:
-              'linear-gradient(#1E2A38 1px, transparent 1px), linear-gradient(90deg, #1E2A38 1px, transparent 1px)',
+              'linear-gradient(var(--ink) 1px, transparent 1px), linear-gradient(90deg, var(--ink) 1px, transparent 1px)',
             backgroundSize: '20px 20px',
           }}
         />
@@ -79,7 +79,7 @@ export const RouteMap: React.FC<RouteMapProps> = ({
           <path
             d="M 40 70 Q 200 10 360 70"
             fill="none"
-            stroke="#1E2A38"
+            stroke="var(--ink)"
             strokeWidth="3"
             strokeDasharray="6 6"
             opacity="0.3"
@@ -89,7 +89,7 @@ export const RouteMap: React.FC<RouteMapProps> = ({
           <path
             d="M 40 70 Q 200 10 360 70"
             fill="none"
-            stroke={isFailed ? '#B4432E' : '#2E6B4F'}
+            stroke={isFailed ? 'var(--stamp-red)' : 'var(--stamp-green)'}
             strokeWidth="4"
             strokeDasharray="400"
             strokeDashoffset={400 - (400 * progressPct) / 100}
@@ -98,19 +98,19 @@ export const RouteMap: React.FC<RouteMapProps> = ({
 
           {/* Pickup Point Pin */}
           <g transform="translate(40, 70)">
-            <circle r="12" fill="#F1ECE0" stroke="#1E2A38" strokeWidth="2.5" />
-            <circle r="5" fill="#1E2A38" />
+            <circle r="12" fill="var(--paper)" stroke="var(--ink)" strokeWidth="2.5" />
+            <circle r="5" fill="var(--ink)" />
           </g>
 
           {/* Drop Point Pin */}
           <g transform="translate(360, 70)">
-            <circle r="12" fill="#F1ECE0" stroke="#1E2A38" strokeWidth="2.5" />
-            <circle r="5" fill={status === 'DELIVERED' ? '#2E6B4F' : '#B4432E'} />
+            <circle r="12" fill="var(--paper)" stroke="var(--ink)" strokeWidth="2.5" />
+            <circle r="5" fill={status === 'DELIVERED' ? 'var(--stamp-green)' : 'var(--stamp-red)'} />
           </g>
 
           {/* Moving Vehicle Indicator */}
           <g transform={`translate(${vehicleX}, ${vehicleY})`} className="transition-all duration-500 ease-out">
-            <circle r="16" fill={isFailed ? '#B4432E' : '#1E2A38'} className="shadow-md" />
+            <circle r="16" fill={isFailed ? 'var(--stamp-red)' : 'var(--ink)'} className="shadow-md" />
             <foreignObject x="-10" y="-10" width="20" height="20">
               <div className="w-full h-full flex items-center justify-center text-paper">
                 <Truck size={13} />
@@ -121,19 +121,19 @@ export const RouteMap: React.FC<RouteMapProps> = ({
 
         {/* Labels */}
         <div className="absolute left-3 top-3 text-left">
-          <div className="font-mono text-[10px] uppercase font-bold text-slate-500 flex items-center">
-            <MapPin size={11} className="mr-1 text-slate-700" /> Origin Zone
+          <div className="font-mono text-[10px] uppercase font-bold text-text-muted flex items-center">
+            <MapPin size={11} className="mr-1 text-text-secondary" /> Origin Zone
           </div>
-          <div className="font-mono text-xs font-bold text-[#1E2A38]">{pickupZoneName}</div>
-          <div className="font-mono text-[10px] text-slate-600">PIN: {pickupPincode}</div>
+          <div className="font-mono text-xs font-bold text-text-primary">{pickupZoneName}</div>
+          <div className="font-mono text-[10px] text-text-secondary">PIN: {pickupPincode}</div>
         </div>
 
         <div className="absolute right-3 top-3 text-right">
-          <div className="font-mono text-[10px] uppercase font-bold text-slate-500 flex items-center justify-end">
-            Destination <MapPin size={11} className="ml-1 text-slate-700" />
+          <div className="font-mono text-[10px] uppercase font-bold text-text-muted flex items-center justify-end">
+            Destination <MapPin size={11} className="ml-1 text-text-secondary" />
           </div>
-          <div className="font-mono text-xs font-bold text-[#1E2A38]">{dropZoneName}</div>
-          <div className="font-mono text-[10px] text-slate-600">PIN: {dropPincode}</div>
+          <div className="font-mono text-xs font-bold text-text-primary">{dropZoneName}</div>
+          <div className="font-mono text-[10px] text-text-secondary">PIN: {dropPincode}</div>
         </div>
       </div>
     </div>

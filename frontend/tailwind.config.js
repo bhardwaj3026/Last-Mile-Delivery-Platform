@@ -4,13 +4,16 @@ export default {
   theme: {
     extend: {
       colors: {
-        paper: '#F1ECE0',
-        ink: '#1E2A38',
-        kraft: '#E6DEC8',
-        'stamp-red': '#B4432E',
-        'stamp-green': '#2E6B4F',
-        'stamp-amber': '#C68A2E',
-        'stamp-blue': '#1D5C8A',
+        paper: 'var(--paper)',
+        ink: 'var(--ink)',
+        kraft: 'var(--kraft)',
+        'text-primary': 'var(--text-primary)',
+        'text-secondary': 'var(--text-secondary)',
+        'text-muted': 'var(--text-muted)',
+        'stamp-red': 'var(--stamp-red)',
+        'stamp-green': 'var(--stamp-green)',
+        'stamp-amber': 'var(--stamp-amber)',
+        'stamp-blue': 'var(--stamp-blue)',
       },
       fontFamily: {
         stencil: ['"Archivo Narrow"', 'sans-serif'],
