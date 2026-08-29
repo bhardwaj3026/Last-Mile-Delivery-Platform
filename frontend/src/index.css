@@ -176,9 +176,34 @@ select,
   transition: opacity 200ms ease-out;
 }
 
+/* Cat Mascot Animations */
+@keyframes catIdleBob {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-3px); }
+}
+
+.animate-cat-bob {
+  animation: catIdleBob 3.2s ease-in-out infinite 0.6s;
+}
+
+@keyframes catBlink {
+  0%, 100% { transform: scaleY(1); }
+  50% { transform: scaleY(0.1); }
+}
+
+.cat-eye-blink {
+  animation: catBlink 160ms ease-in-out;
+}
+
 /* Reduced Motion Constraints */
 @media (prefers-reduced-motion: reduce) {
   .animate-float-drift {
+    animation: none !important;
+  }
+  .animate-cat-bob {
+    animation: none !important;
+  }
+  .cat-eye-blink {
     animation: none !important;
   }
   .perforated-shimmer-bar {
@@ -208,5 +233,6 @@ select,
     animation: none !important;
   }
 }
+
 
 

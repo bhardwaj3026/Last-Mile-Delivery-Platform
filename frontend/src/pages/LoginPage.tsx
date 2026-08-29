@@ -3,6 +3,7 @@ import { useAuth } from '../context/AuthContext';
 import { useNavigate, Link } from 'react-router-dom';
 import { AlertCircle, KeyRound, Mail } from 'lucide-react';
 import { StatusStamp } from '../components/StatusStamp';
+import { CatMascot } from '../components/CatMascot';
 
 export const LoginPage: React.FC = () => {
   const { login } = useAuth();
@@ -114,6 +115,9 @@ export const LoginPage: React.FC = () => {
             isShaking ? 'animate-card-shake' : ''
           }`}
         >
+          {/* Original Cartoon Cat Mascot with Cursor-Tracking Eyes */}
+          <CatMascot />
+
           {/* Hero Stamp Submission Overlay */}
           {stampState !== 'none' && (
             <div
